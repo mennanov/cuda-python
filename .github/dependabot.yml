@@ -56,7 +56,7 @@ updates:
   # GitHub Actions updates targeting the 12.9.x branch
   - package-ecosystem: github-actions
     directory: /
-    target-branch: "12.9.x"  # keep in sync with backport_branch in ci/versions.yml
+    target-branch: "12.9.x"  # keep in sync with backport_branch in ci/versions.yml (checked by blockwatch.toml)
     schedule:
       interval: "monthly"
       time: "09:00"

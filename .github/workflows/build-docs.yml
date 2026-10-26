@@ -350,7 +350,7 @@ jobs:
     needs: build
     if: ${{ inputs.deploy-docs && needs.build.result == 'success' }}
     runs-on: ubuntu-latest
-    # Must match every job that writes to gh-pages.
+    # Must match every job that writes to gh-pages (checked by blockwatch.toml).
     concurrency:
       group: cuda-python-gh-pages-publish
       queue: max

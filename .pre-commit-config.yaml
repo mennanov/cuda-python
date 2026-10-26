@@ -71,14 +71,6 @@ repos:
         files: ^cuda_bindings_(?:12|13)/
         types: [text]
 
-      - id: check-pixi-cuda-version
-        name: Check pixi cuda-version pins track ci/versions.yml
-        entry: python ./ci/tools/check_pixi_cuda_version.py
-        language: python
-        additional_dependencies: [pyyaml==6.0.3]
-        files: '^(ci/versions\.yml|cuda_bindings_13/pixi\.toml|cuda_core/pixi\.toml)$'
-        pass_filenames: false
-
       - id: check-mempool-hygiene
         name: Check tests do not create uncapped memory pools
         entry: python ./ci/tools/check_mempool_hygiene.py
@@ -200,6 +192,12 @@ repos:
         args: [--config-file=cuda_core/pyproject.toml, cuda_core/cuda/core]
         additional_dependencies:
           - numpy==2.4.2
+
+  # Checks the values that blockwatch.toml lists as kept in sync across files.
+  - repo: https://github.com/mennanov/blockwatch
+    rev: db1b20c6c842c9540ec57774f53f1195274665ca  # frozen: v0.16.0
+    hooks:
+      - id: blockwatch
 
   - repo: https://github.com/rhysd/actionlint
     rev: "914e7df21a07ef503a81201c76d2b11c789d3fca"  # frozen: v1.7.12
