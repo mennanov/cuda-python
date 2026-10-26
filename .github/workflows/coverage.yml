@@ -600,7 +600,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-    # Must match every job that writes to gh-pages.
+    # Must match every job that writes to gh-pages (checked by blockwatch.toml).
     concurrency:
       group: cuda-python-gh-pages-publish
       queue: max

@@ -1,0 +1,53 @@
+# SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+# Values that live in more than one file. The blockwatch pre-commit hook fails
+# when one copy changes and the others don't. Rules: `blockwatch skill`.
+
+# CUDA Toolkit: ci/versions.yml decides what CI builds against. The pixi
+# environments must pin the same major.minor (13.4.2 in CI, "13.4.*" in pixi).
+# After a CUDA major bump, change cu13 to the new major.
+[[block]]
+target = '{cuda_bindings_13,cuda_core}/pixi.toml#/feature/cu13/dependencies/cuda-version'
+same-as = 'ci/versions.yml#/cuda/build/version'
+same-as-pattern = '^(?P<value>\d+\.\d+)\.'
+
+# The build variants also list "12.*", which has no minor, so the pattern skips it.
+[[block]]
+target = '{cuda_bindings_13,cuda_core}/pixi.toml#/workspace/build-variants/cuda-version'
+same-as = 'ci/versions.yml#/cuda/build/version'
+same-as-pattern = '(?P<value>\d+\.\d+)\.[\d*]'
+
+# Dependabot opens the backport PRs against the backport branch.
+[[block]]
+target = 'ci/versions.yml#/backport_branch'
+name = 'backport-branch'
+
+[[block]]
+target = '.github/dependabot.yml'
+target-pattern = 'target-branch: "(?P<value>[^"]+)"'
+same-as = 'ci/versions.yml:backport-branch'
+
+# Every job that writes to gh-pages must wait in one concurrency queue.
+[[block]]
+target = '.github/workflows/build-docs.yml#/jobs/deploy/concurrency/group'
+name = 'gh-pages-lock'
+
+[[block]]
+target = '.github/workflows/coverage.yml#/jobs/deploy/concurrency/group'
+same-as = '.github/workflows/build-docs.yml:gh-pages-lock'
+
+[[block]]
+target = '.github/workflows/cleanup-pr-previews.yml#/jobs/cleanup/concurrency/group'
+same-as = '.github/workflows/build-docs.yml:gh-pages-lock'
+
+# ci/cleanup-pr-previews refuses to push unless the workflow passes the lock name.
+[[block]]
+target = '.github/workflows/cleanup-pr-previews.yml#/jobs/cleanup/steps/~[id=cleanup]/env/GH_PAGES_PUBLISH_LOCK'
+same-as = '.github/workflows/build-docs.yml:gh-pages-lock'
+
+[[block]]
+target = 'ci/cleanup-pr-previews'
+target-pattern = 'GH_PAGES_PUBLISH_LOCK:-\}" != "(?P<value>[^"]+)"'
+same-as = '.github/workflows/build-docs.yml:gh-pages-lock'
